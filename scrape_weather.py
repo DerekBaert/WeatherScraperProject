@@ -87,7 +87,8 @@ class WeatherScraper(HTMLParser):
                             else:
                                 self.add_to_dictionary(data)
                                 self.count = self.count + 1
-                        elif(self.count == 3):
+                        ## Added check to see if daily_temps was empty before adding to weather dictionary.
+                        elif(self.count == 3 and self.daily_temps):
                             self.weather[self.entry_date] = self.daily_temps
                             self.daily_temps = {}
             else:
