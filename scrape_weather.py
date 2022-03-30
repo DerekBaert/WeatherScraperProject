@@ -64,13 +64,17 @@ class WeatherScraper(HTMLParser):
                     self.count = 0
                 if(tag == "td"):
                     self.in_data = False
+            # Moved print statement to be when finished handling the table body.
+            if(tag == "tbody"):
+                print(self.weather)
         except Exception as error:
             print("Error checking end tag", error)
                 
     def handle_data(self, data):
         """
         Adds the name of the colour and the hex code to the dictionary and sets the colour flag back to false.
-        """     
+        """
+        potato = False
         try:  
             if(not self.stop):
                 if(self.in_body): 
@@ -91,8 +95,6 @@ class WeatherScraper(HTMLParser):
                         elif(self.count == 3 and self.daily_temps):
                             self.weather[self.entry_date] = self.daily_temps
                             self.daily_temps = {}
-            else:
-                print(self.weather)
         except Exception as error:
             print("Error checking or printing data", error)
     def add_to_dictionary(self, data):
