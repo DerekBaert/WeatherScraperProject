@@ -115,10 +115,11 @@ today = datetime.today()
 myscraper = WeatherScraper()
 # user_year = input("Enter a year: ")
 # user_month = input("Enter a month: ")
+print(today)
 try:
-    #with urllib.request.urlopen(f'https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear={today.year}&Day={today.day}&Year={today.year}&Month={today.month}') as response:
+    with urllib.request.urlopen(f'https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear={today.year}&Day={today.day}&Year={today.year}&Month={today.month}') as response:
     #with urllib.request.urlopen(f'https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear={user_year}&Day=1&Year={user_year}&Month={user_month}') as response:
-    with urllib.request.urlopen('https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear=2022&Day=1&Year=2018&Month=3') as response:
+    # with urllib.request.urlopen('https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear=2022&Day=1&Year=2018&Month=3') as response:
         html = str(response.read())
     myscraper.feed(html)
     input("")
