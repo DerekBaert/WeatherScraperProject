@@ -9,7 +9,7 @@ class DBOperations():
     def initialize_db(self):
         """Function level docstring"""
         with dbcm.DBCM("weather.sqlite") as curs:
-            curs.execute("""create table sample_data
+            curs.execute("""create table if not exists sample_data
                     (id integer primary key autoincrement not null,
                     sample_date text not null,
                     location text not null,                   
