@@ -7,6 +7,8 @@ from importlib.metadata import entry_points
 import urllib.request
 from datetime import datetime
 import pprint
+import dbcm
+from db_operations import DBOperations
 
 class WeatherScraper(HTMLParser):
     """
@@ -119,8 +121,9 @@ class WeatherScraper(HTMLParser):
 today = datetime.today()
 year = today.year
 month = today.month
-weather_dictionary = {}
 end_check = True
+weather = {}
+
 month = 12
 year = 1997
 
@@ -131,8 +134,7 @@ while end_check:
         with urllib.request.urlopen(f'https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear=2022&Day=1&Year={year}&Month={month}') as response:
             html = str(response.read())
         myscraper.feed(html)
-        pprint.pprint(myscraper.weather)
-        weather_dictionary = weather_dictionary | myscraper.weather
+        weather = weather | myscraper.weather
         if myscraper.weather:
             end_check = myscraper.compare_url(month)
         if (month == 1):
@@ -143,3 +145,10 @@ while end_check:
                 
     except Exception as error:
         print("Error parsing HTML", error)
+
+pprint.pprint(weather)
+
+db = DBOperations
+db.initialize_db
+db.save_data(db, weather)
+db.fetch_data
