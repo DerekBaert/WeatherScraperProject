@@ -47,7 +47,6 @@ class WeatherScraper(HTMLParser):
                         self.in_data = True
                     if(tag == "th"):    
                         self.row_head = True
-                    # Why isn't this nested?
                     if(tag == "abbr" and self.row_head):
                         self.in_row_date = True                                        
                         try:                                
