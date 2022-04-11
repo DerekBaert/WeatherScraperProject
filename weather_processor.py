@@ -70,7 +70,6 @@ class WeatherProcessor():
         date = datetime(int(year), int(month), 1)
         weather = self.db.fetch_data(values = None, date = date)
         self.plot.line_plot(weather)
-    def 
         
 weather = WeatherProcessor()
 weather.user_choice()
