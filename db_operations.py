@@ -1,5 +1,6 @@
 """Handles all database queries for the weather database."""
 
+from re import I
 import sqlite3
 from datetime import datetime
 from dbcm import DBCM
@@ -14,10 +15,10 @@ class DBOperations():
                 curs.execute("""create table if not exists sample_data
                         (id integer primary key autoincrement not null,
                         sample_date text not null,
-                        location text not null,                   
-                        min_temp real not null,
-                        max_temp real not null,
-                        avg_temp real not null);""")
+                        location text,                   
+                        min_temp real,
+                        max_temp real,
+                        avg_temp real);""")
         except Exception as error:
             print("Error: initailize_db: Create database if doesn't exist: ", error)
     def save_data(self, sample_data):
@@ -73,15 +74,32 @@ class DBOperations():
                     print("Error: purge_data: Executing sql: ", error)
         except Exception as error:
             print("Error: purge_data: Accessing database: ", error)
-    def fetch_data(self):
+    def fetch_data(self, values, date):
         """Prints each row of the database."""
-        try:
+        if (date):
+            modified_date = []
+            line_plot_dictionary = {}
+            modified_date.append("%" + date.strftime("%Y") + "-" + date.strftime("%m") + "%")
             with DBCM("weather.sqlite") as curs:
-                sql = """select * from sample_data"""
-                try:
-                    for row in curs.execute(sql):
-                        print(row)
-                except Exception as error:
-                    print("Error: fetch_data: Looping through database: ", error)
-        except Exception as error:
-            print("Error: fetch_data: Accessing database: ", error)
+                sql = """select sample_date, avg_temp from sample_data where sample_date like ?"""
+                for row in curs.execute(sql, modified_date):
+                    line_plot_dictionary[row[0]] = row[1]
+            return line_plot_dictionary
+        else:
+            box_plot_dictionary = {}
+            month_data = []
+            values.append("")
+            with DBCM("weather.sqlite") as curs:
+                for i in range(1, 13):
+                    if i >= 10:
+                        values[2] = ("%-" + str(i) + "-%")
+                    else:
+                        values[2] = ("%-0" + str(i) + "-%")
+                    sql = """select sample_date, avg_temp from sample_data where sample_date between ? and ? and sample_date like ?"""
+                    for row in curs.execute(sql, values):
+                        if (row[1] is not None):
+                            month_data.append(row[1])
+                    box_plot_dictionary[i] = month_data
+                    month_data = []
+            return box_plot_dictionary
+

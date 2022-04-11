@@ -86,7 +86,7 @@ class WeatherScraper(HTMLParser):
                                     data = data.strip()
                                     if(data == "M" or data == ""):
                                         try:
-                                            self.add_to_dictionary("M")
+                                            self.add_to_dictionary(None)
                                             self.missing = False
                                             self.count = self.count + 1
                                         except Exception as error:
@@ -141,42 +141,3 @@ class WeatherScraper(HTMLParser):
                     print("Error: compare_url: Checking if months are the same: ", error)
         except Exception as error:
             print("Error: compare_url: Checking if entry_date exists: ", error)
-
-try:
-    today = datetime.today()
-    year = today.year
-    month = today.month
-    end_check = True
-    weather = {}
-except Exception as error:
-    print("Error: main: Initializing variables: ", error)
-
-try:
-    while end_check:
-        print(f"Year: {year} Month: {month}")
-        myscraper = WeatherScraper()
-        try:
-            with urllib.request.urlopen(f'https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear=2022&Day=1&Year={year}&Month={month}') as response:
-                html = str(response.read())
-            myscraper.feed(html)
-            weather = weather | myscraper.weather
-            if myscraper.weather:
-                end_check = myscraper.compare_url(month)
-            if (month == 1):
-                year = year - 1
-                month = 12
-            else:
-                month = month - 1
-                    
-        except Exception as error:
-            print("Error parsing HTML", error)
-except Exception as error:
-    print("Error: main: Checking while loop: ", error)
-
-try:
-    db = DBOperations()
-    db.initialize_db()
-    db.save_data(weather)
-    db.fetch_data()
-except Exception as error:
-    print("Error: main: Database calls: ", error)
