@@ -128,12 +128,12 @@ class WeatherScraper(HTMLParser):
                         print("Error: add_to_dictionary: Adding mean: ", error)
         except Exception as error:
             print("Error: add_to_dictionary: Matching count: ", error)
-    def compare_url(self, url_month):
+    def compare_url(self, url_month, url_year):
         """Compare the url month to the month in the attribute tag to determine when to stop scraping."""
         try:
             if self.entry_date:
                 try:
-                    if url_month != self.entry_date.month:
+                    if url_month != self.entry_date.month and url_year != self.entry_date.year:
                         return False
                     else:
                         return True
@@ -141,3 +141,9 @@ class WeatherScraper(HTMLParser):
                     print("Error: compare_url: Checking if months are the same: ", error)
         except Exception as error:
             print("Error: compare_url: Checking if entry_date exists: ", error)
+    def compare_date(self, last_date):
+        if self.entry_date:
+            if last_date == self.entry_date:
+                return False
+            else:
+                return True

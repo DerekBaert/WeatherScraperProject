@@ -34,4 +34,5 @@ class PlotOperations():
         plt.title('Daily Average Temperatures')
         plt.ylabel('Average Temperature')
         plt.xlabel('Day')
+        plt.xticks(rotation='vertical')
         plt.show()
