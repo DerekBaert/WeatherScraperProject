@@ -19,6 +19,8 @@ class PlotOperations():
             data.append(weather_data[month])
 
         plt.boxplot(data)
+        plt.ylabel('Average Temperature')
+        plt.xlabel('Month')
         plt.show()
 
     def line_plot(self, weather_data):
