@@ -74,32 +74,38 @@ class DBOperations():
                     print("Error: purge_data: Executing sql: ", error)
         except Exception as error:
             print("Error: purge_data: Accessing database: ", error)
-    def fetch_data(self, values, date):
+    def fetch_box_data(self, values):
         """Prints each row of the database."""
-        if (date):
-            modified_date = []
-            line_plot_dictionary = {}
-            modified_date.append("%" + date.strftime("%Y") + "-" + date.strftime("%m") + "%")
-            with DBCM("weather.sqlite") as curs:
-                sql = """select sample_date, avg_temp from sample_data where sample_date like ?"""
-                for row in curs.execute(sql, modified_date):
-                    line_plot_dictionary[row[0]] = row[1]
-            return line_plot_dictionary
-        else:
-            box_plot_dictionary = {}
-            month_data = []
-            values.append("")
-            with DBCM("weather.sqlite") as curs:
-                for i in range(1, 13):
-                    if i >= 10:
-                        values[2] = ("%-" + str(i) + "-%")
-                    else:
-                        values[2] = ("%-0" + str(i) + "-%")
-                    sql = """select sample_date, avg_temp from sample_data where sample_date between ? and ? and sample_date like ?"""
-                    for row in curs.execute(sql, values):
-                        if (row[1] is not None):
-                            month_data.append(row[1])
-                    box_plot_dictionary[i] = month_data
-                    month_data = []
-            return box_plot_dictionary
+        box_plot_dictionary = {}
+        month_data = []
+        values.append("")
+        with DBCM("weather.sqlite") as curs:
+            for i in range(1, 13):
+                if i >= 10:
+                    values[2] = ("%-" + str(i) + "-%")
+                else:
+                    values[2] = ("%-0" + str(i) + "-%")
+                sql = """select sample_date, avg_temp from sample_data where sample_date between ? and ? and sample_date like ?"""
+                for row in curs.execute(sql, values):
+                     if (row[1] is not None):
+                         month_data.append(row[1])
+                box_plot_dictionary[i] = month_data
+                month_data = []
+        return box_plot_dictionary
+    def fetch_line_data(self, date):
+        modified_date = []
+        line_plot_dictionary = {}
+        modified_date.append("%" + date.strftime("%Y") + "-" + date.strftime("%m") + "%")
+        with DBCM("weather.sqlite") as curs:
+            sql = """select sample_date, avg_temp from sample_data where sample_date like ?"""
+            for row in curs.execute(sql, modified_date):
+                line_plot_dictionary[row[0]] = row[1]
+        return line_plot_dictionary
+    def last_day(self):     
+        last_date = ""   
+        with DBCM("weather.sqlite") as curs:                
+            sql = """select MAX(sample_date) from sample_data"""
+            for row in curs.execute(sql):
+                last_date = datetime.strptime(str(row).strip("(),'"), "%Y-%m-%d")
+        return last_date
 
