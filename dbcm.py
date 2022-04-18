@@ -1,6 +1,7 @@
 """Context managers for database connection."""
 
 import sqlite3
+import logging
 
 class DBCM():
     """Class level doctsring"""
@@ -11,21 +12,21 @@ class DBCM():
             self.conn = None
             self.curs = None
         except Exception as error:
-            print("Error: DBCM: Init: ", error)
+            logging.warning("Error: DBCM: Init: ", error)
     def __enter__(self) -> 'curs':
         try:
             self.conn = sqlite3.connect(self.db_name)
         except Exception as error:
-            print("Error: DBCM: Enter: Creating cursor: ", error)
+            logging.warning("Error: DBCM: Enter: Creating cursor: ", error)
         try:
             self.curs = self.conn.cursor()
             return self.curs
         except Exception as error:
-            print("Error: DBCM: Enter: Creating cursor: ", error)
+            logging.warning("Error: DBCM: Enter: Creating cursor: ", error)
     def __exit__(self, exc_type, exc_value, exc_trace) -> None:
         try:
             self.conn.commit()
             self.curs.close()
             self.conn.close()
         except Exception as error:
-            print("Error: DBCM: Exit: Committing or closing: ", error)
+            logging.warning("Error: DBCM: Exit: Committing or closing: ", error)

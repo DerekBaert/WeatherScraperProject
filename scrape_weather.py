@@ -9,6 +9,7 @@ from datetime import datetime
 import pprint
 import dbcm
 from db_operations import DBOperations
+import logging
 
 class WeatherScraper(HTMLParser):
     """
@@ -31,7 +32,7 @@ class WeatherScraper(HTMLParser):
             self.weather = {}
             self.count = 0
         except Exception as error:
-            print("Error: Init: Initialize variables: ", error)
+            logging.warning("Error: Init: Initialize variables: ", error)
     def handle_starttag(self, tag, attrs):
         """
         Checking if the tag attribute to determine if the parser is in the row.
@@ -47,15 +48,14 @@ class WeatherScraper(HTMLParser):
                         self.in_data = True
                     if(tag == "th"):    
                         self.row_head = True
-                    # Why isn't this nested?
                     if(tag == "abbr" and self.row_head):
                         self.in_row_date = True                                        
                         try:                                
                             self.entry_date = datetime.strptime(attrs[0][1],'%B %d, %Y')
-                        except Exception as e:
-                            print("Error parsing date", e)                      
+                        except Exception as error:
+                            logging.warning("Error: handle_starttag: Parsing date", error)                      
         except Exception as error:
-            print("Error checking start tag", error)
+            logging.warning("Error: handle_starttag: Checking start tag: ", error)
             
     def handle_endtag(self, tag):
         """
@@ -69,7 +69,7 @@ class WeatherScraper(HTMLParser):
                 if(tag == "td"):
                     self.in_data = False
         except Exception as error:
-            print("Error checking end tag", error)
+            logging.warning("Error: handle_endtag: Checking end tag: ", error)
                 
     def handle_data(self, data):
         """
@@ -90,7 +90,7 @@ class WeatherScraper(HTMLParser):
                                             self.missing = False
                                             self.count = self.count + 1
                                         except Exception as error:
-                                            print("Error: handle_data: Handling missing data: ", error)
+                                            logging.warning("Error: handle_data: Handling missing data: ", error)
                                     elif(data == "LegendM" or data == "LegendE" or data == "E"):
                                         pass
                                     else:
@@ -98,15 +98,15 @@ class WeatherScraper(HTMLParser):
                                             self.add_to_dictionary(data)
                                             self.count = self.count + 1
                                         except Exception as error:
-                                            print("Error: handle_data: Handling existing data: ", error)
+                                            logging.warning("Error: handle_data: Handling existing data: ", error)
                                 elif(self.count == 3 and self.daily_temps):
                                     try:
                                         self.weather[self.entry_date.strftime('%Y-%m-%d')] = self.daily_temps
                                         self.daily_temps = {}
                                     except Exception as error:
-                                        print("Error: handle_data: Adding data to weather dictionary: ", error)
+                                        logging.warning("Error: handle_data: Adding data to weather dictionary: ", error)
         except Exception as error:
-            print("Error checking or printing data", error)
+            logging.warning("Error checking or printing data", error)
     def add_to_dictionary(self, data):
         """Add data to weather dictionary based on count."""
         try:
@@ -115,35 +115,29 @@ class WeatherScraper(HTMLParser):
                     try:
                         self.daily_temps['Max'] = data
                     except Exception as error:
-                        print("Error: add_to_dictionary: Adding max: ", error)
+                        logging.warning("Error: add_to_dictionary: Adding max: ", error)
                 case 1:
                     try:
                         self.daily_temps['Min'] = data
                     except Exception as error:
-                        print("Error: add_to_dictionary: Adding min: ", error)
+                        logging.warning("Error: add_to_dictionary: Adding min: ", error)
                 case 2:
                     try:
                         self.daily_temps['Mean'] = data
                     except Exception as error:
-                        print("Error: add_to_dictionary: Adding mean: ", error)
+                        logging.warning("Error: add_to_dictionary: Adding mean: ", error)
         except Exception as error:
-            print("Error: add_to_dictionary: Matching count: ", error)
+            logging.warning("Error: add_to_dictionary: Matching count: ", error)
     def compare_url(self, url_month, url_year):
         """Compare the url month to the month in the attribute tag to determine when to stop scraping."""
         try:
             if self.entry_date:
                 try:
-                    if url_month != self.entry_date.month and url_year != self.entry_date.year:
-                        return False
-                    else:
+                    if url_month == self.entry_date.month and url_year == self.entry_date.year:
                         return True
+                    else:
+                        return False
                 except Exception as error:
-                    print("Error: compare_url: Checking if months are the same: ", error)
+                    logging.warning("Error: compare_url: Checking if months are the same: ", error)
         except Exception as error:
-            print("Error: compare_url: Checking if entry_date exists: ", error)
-    def compare_date(self, last_date):
-        if self.entry_date:
-            if last_date == self.entry_date:
-                return False
-            else:
-                return True
+            logging.warning("Error: compare_url: Checking if entry_date exists: ", error)
