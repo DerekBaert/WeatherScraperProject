@@ -128,7 +128,7 @@ class WeatherScraper(HTMLParser):
         """Compare the url month to the month in the
         attribute tag to determine when to stop scraping."""
         match = False
-        try:   
+        try:
             if self.entry_date:
                 try:
                     if url_month == self.entry_date.month and url_year == self.entry_date.year:

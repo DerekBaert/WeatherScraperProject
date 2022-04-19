@@ -1,10 +1,10 @@
-"""Context managers for database connection."""
+"""Context manager for database connection."""
 
 import sqlite3
 import logging
 
 class DBCM():
-    """Class level doctsring"""
+    """Handles all connections to the database."""
 
     def __init__(self, db_name) -> None:
         try:

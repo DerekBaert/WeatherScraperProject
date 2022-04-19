@@ -39,8 +39,8 @@ class DBOperations():
         try:
             for date, temps in sample_data.items():
                 try:
-                    date = datetime.strptime(str(date).strip("'"), "%Y-%m-%d")
-                    if last_date == "None" or last_date < date:
+                    compare_date = datetime.strptime(str(date).strip("'"), "%Y-%m-%d")
+                    if last_date == "None" or last_date < compare_date:
                         data = []
                         try:
                             data.append(date)
@@ -117,5 +117,18 @@ class DBOperations():
                 for row in curs.execute(sql):
                     last_date = datetime.strptime(str(row).strip("(),'"), "%Y-%m-%d")
         except Exception as error:
-            logging.warning("last_day: Retrieving the earliest date from database: %s", error)
+            logging.warning("Error: last_day: Retrieving the most current date from database: %s", error)
         return last_date
+
+    def first_day(self):
+        """Fetches the first date from the data in the database."""
+        first_date = ""
+        try:
+            with DBCM("weather.sqlite") as curs:
+                sql = """select MIN(sample_date) from sample_data"""
+                for row in curs.execute(sql):
+                    first_date = datetime.strptime(str(row).strip("(),'"), "%Y-%m-%d")
+        except Exception as error:
+            logging.warning("Error: first_day: Retrieving the earliest date from database: %s", error)
+        return first_date
+        
