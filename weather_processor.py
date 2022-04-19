@@ -214,6 +214,6 @@ class WeatherProcessor():
         except Exception as error:
             logging.warning("Error: generate_line_plot: Creating box plot: %s", error)
 
-logging.basicConfig(filename="weatherlogfile.log", level=logging.WARNING)
+logging.basicConfig(filename="weatherlogfile.log", level=logging.WARNING, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 weather = WeatherProcessor()
 weather.user_choice()
