@@ -1,9 +1,8 @@
 """
 Handles the creation of the box and line plots.
 """
-import matplotlib.pyplot as plt
-import numpy as np
 import logging
+import matplotlib.pyplot as plt
 
 class PlotOperations():
     """Class for receiving weather data"""
@@ -13,18 +12,19 @@ class PlotOperations():
 
     def box_plot(self, weather_data):
         """
-        Takes in a dictionary of lists containing average temps for each month over a range of years and plots them on a box plot.
+        Takes in a dictionary of lists containing average
+        temps for each month over a range of years and plots them on a box plot.
         """
         try:
             data = []
         except Exception as error:
-            logging.warning("Error: box_plot: Initiliazing variables: ", error)
+            logging.warning("Error: box_plot: Initiliazing variables: %s", error)
 
         try:
             for month in weather_data:
                 data.append(weather_data[month])
         except Exception as error:
-            logging.warning("Error: box_plot: Organizing data for plot: ", error)
+            logging.warning("Error: box_plot: Organizing data for plot: %s", error)
 
         try:
             plt.boxplot(data)
@@ -32,24 +32,24 @@ class PlotOperations():
             plt.xlabel('Month')
             plt.show()
         except Exception as error:
-            logging.warning("Error: box_plot: Creating plot: ", error)
+            logging.warning("Error: box_plot: Creating plot: %s", error)
 
     def line_plot(self, weather_data):
         """
-        Takes in a dictionary of daily average temperatures for a month and plots them on a line plot.
+        Takes in a dictionary of daily average
+        temperatures for a month and plots them on a line plot.
         """
         try:
             data = []
             dates = []
         except Exception as error:
-            logging.warning("Error: line_plot: Initiliazing variables: ", error)
+            logging.warning("Error: line_plot: Initiliazing variables: %s", error)
         try:
             for day in weather_data:
                 dates.append(day)
                 data.append(weather_data[day])
         except Exception as error:
-            logging.warning("Error: line_plot: Organizing data for plot: ", error)
-        
+            logging.warning("Error: line_plot: Organizing data for plot: %s", error)
         try:
             plt.plot(dates, data)
             plt.title('Daily Average Temperatures')
@@ -58,4 +58,4 @@ class PlotOperations():
             plt.xticks(rotation='vertical')
             plt.show()
         except Exception as error:
-            logging.warning("Error: line_plot: Creating plot: ", error)
+            logging.warning("Error: line_plot: Creating plot: %s", error)
