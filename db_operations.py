@@ -117,7 +117,7 @@ class DBOperations():
                 for row in curs.execute(sql):
                     last_date = datetime.strptime(str(row).strip("(),'"), "%Y-%m-%d")
         except Exception as error:
-            logging.warning("Error: last_day: Retrieving the most current date from database: %s", error)
+            logging.warning("last_day: Retrieving the most current date from database: %s", error)
         return last_date
 
     def first_day(self):
@@ -129,6 +129,6 @@ class DBOperations():
                 for row in curs.execute(sql):
                     first_date = datetime.strptime(str(row).strip("(),'"), "%Y-%m-%d")
         except Exception as error:
-            logging.warning("Error: first_day: Retrieving the earliest date from database: %s", error)
+            logging.warning("first_day: Retrieving the earliest date from database: %s", error)
         return first_date
         

@@ -17,7 +17,11 @@ class WeatherProcessor():
         Prompt user for selection.
         """
         print("Welcome to the Weather Processor.")
-        print("Please make a selection:\n1: Update Weather Set\n2: Download Full Data Set\n3. Generate Box Plot from Range\n4: Generate Line Plot from Date")
+        print("""Please make a selection:
+        1: Update Weather Set
+        2: Download Full Data Set
+        3. Generate Box Plot from Range
+        4: Generate Line Plot from Date""")
         try:
             option = input("Selection: ")
         except Exception as error:
@@ -136,23 +140,27 @@ class WeatherProcessor():
                 while True:
                     start_year = input("Enter the starting year: ")
                     try:
-                        if len(start_year) == 4 and start_year.isdigit() and int(start_year) in range(int(earliest_date.year), int(latest_date.year) + 1):
+                        start_in_range = int(start_year) in range(int(earliest_date.year), int(latest_date.year) + 1)
+                        if len(start_year) == 4 and start_year.isdigit() and start_in_range:
                             end_year = input("Enter the ending year: ")
                             try:
-                                if len(end_year) == 4 and end_year.isdigit() and int(start_year) in range(int(earliest_date.year), int(latest_date.year) + 1):
+                                end_in_range = int(end_year) in range(int(earliest_date.year), int(latest_date.year) + 1)
+                                after_start = int(end_year) > int(start_year)
+                                length = len(end_year) == 4
+                                if length and end_year.isdigit() and end_in_range and after_start:
                                     input_check = True
                                 else:
                                     input_check = False
-                            except:
+                            except Exception:
                                 input_check = False
                         else:
                             input_check = False
-                    except:
+                    except Exception:
                         input_check = False
-                    if input_check:
-                        break
-                    else:
+                    if not input_check:
                         print(f"Please enter a 4 digit year between {earliest_date.year} and {latest_date.year}.")
+                    else:
+                        break
             except Exception as error:
                 logging.warning("Error: generate_box_plot: Collecting input: %s", error)
             year_range.append(start_year)
@@ -182,13 +190,15 @@ class WeatherProcessor():
                     try:
                         if int(month) in range(1, 13):
                             year = input("Enter a year: ")
-                            if len(year) == 4 and year.isdigit() and int(year) in range(int(earliest_date.year), int(latest_date.year) + 1):
-                                break
+                            year_out_of_range = int(year) not in range(int(earliest_date.year), int(latest_date.year) + 1)
+                            if len(year) != 4 or not year.isdigit() or year_out_of_range:
+                                message = f"Please enter a 4 digit year between {earliest_date.year} and {latest_date.year}."
+                                print(message)
                             else:
-                                print(f"Please enter a 4 digit year between {earliest_date.year} and {latest_date.year}.")
+                                break
                         else:
                             print("Please enter a month between 1-12.")
-                    except:
+                    except ValueError:
                         print("Please enter a month between 1-12.")
             except Exception as error:
                 logging.warning("Error: generate_line_plot: Collecting input: %s", error)
