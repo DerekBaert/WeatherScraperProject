@@ -81,10 +81,12 @@ class WeatherScraper(HTMLParser):
                                     try:
                                         self.add_to_dictionary(None)
                                         self.count = self.count + 1
+                                        logging.warning("handle_data: Found empty/missing data: %s", data)
                                     except Exception as error:
                                         message = "handle_data: Handling missing data: %s", error
                                         logging.warning(message)
                                 elif data in ('LegendM', 'LegendE', 'E'):
+                                    logging.warning("handle_data: Found exception in data: %s", data)
                                     pass
                                 else:
                                     try:

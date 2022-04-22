@@ -26,6 +26,9 @@ class PlotOperations():
         except Exception as error:
             logging.warning("Error: box_plot: Organizing data for plot: %s", error)
 
+        if not data:
+            logging.warning("box_plot: Empty data set")
+
         try:
             plt.boxplot(data)
             plt.ylabel('Average Temperature')
@@ -50,6 +53,10 @@ class PlotOperations():
                 data.append(weather_data[day])
         except Exception as error:
             logging.warning("Error: line_plot: Organizing data for plot: %s", error)
+
+        if not data:
+            logging.warning("line_plot: Empty data set")
+
         try:
             plt.plot(dates, data)
             plt.title('Daily Average Temperatures')

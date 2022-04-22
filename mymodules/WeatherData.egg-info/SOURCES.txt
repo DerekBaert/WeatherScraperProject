@@ -1,0 +1,11 @@
+README.txt
+db_operations.py
+dbcm.py
+plot_operations.py
+scrape_weather.py
+setup.py
+weather_processor.py
+WeatherData.egg-info/PKG-INFO
+WeatherData.egg-info/SOURCES.txt
+WeatherData.egg-info/dependency_links.txt
+WeatherData.egg-info/top_level.txt

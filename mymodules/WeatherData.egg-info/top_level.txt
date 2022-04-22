@@ -1,0 +1,5 @@
+db_operations
+dbcm
+plot_operations
+scrape_weather
+weather_processor
