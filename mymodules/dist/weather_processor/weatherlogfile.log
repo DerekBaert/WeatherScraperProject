@@ -1,8 +1,0 @@
-04/19/2022 04:31:01 PM first_day: Retrieving the earliest date from database: no such table: sample_data
-04/19/2022 04:31:01 PM last_day: Retrieving the most current date from database: no such table: sample_data
-04/19/2022 04:31:03 PM Error: generate_box_plot: Collecting input: 'str' object has no attribute 'year'
-04/19/2022 04:31:03 PM Error: generate_box_plot: Building variables: local variable 'end_year' referenced before assignment
-04/19/2022 04:31:03 PM Error: fetch_box_data: Collecting data from database: list assignment index out of range
-04/19/2022 04:31:10 PM Error: purge_data: Accessing database: no such table: sample_data
-04/19/2022 04:34:47 PM Error: user_choice: Processing user selection: name 'quit' is not defined
-04/19/2022 04:35:16 PM Error: user_choice: Processing user selection: name 'quit' is not defined

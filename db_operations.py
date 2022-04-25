@@ -131,4 +131,14 @@ class DBOperations():
         except Exception as error:
             logging.warning("first_day: Retrieving the earliest date from database: %s", error)
         return first_date
-        
+    def count(self):
+        """Returns number of rows in database"""
+        count = 0
+        try:
+            with DBCM("weather.sqlite") as curs:
+                sql = """select COUNT(*) from sample_data"""
+                curs.execute(sql)
+                count = curs.fetchall()
+        except Exception as error:
+            logging.warning("first_day: Retrieving the earliest date from database: %s", error)
+        return count[0][0]

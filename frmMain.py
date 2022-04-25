@@ -154,24 +154,10 @@ class fraMain ( wx.Frame ):
 		self.btnDownload = wx.Button( self, wx.ID_ANY, u"Download Dataset", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer1.Add( self.btnDownload, 0, wx.ALL, 5 )
 
-		self.lbl_Error = wx.StaticText( self, wx.ID_ANY, u"Error Message", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.lbl_Error.Wrap( -1 )
-
-		self.lbl_Error.SetForegroundColour( wx.Colour( 164, 0, 0 ) )
-		self.lbl_Error.Hide()
-
-		bSizer1.Add( self.lbl_Error, 0, wx.ALL, 5 )
-
-		self.lbl_Status = wx.StaticText( self, wx.ID_ANY, u"Status Message", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.lbl_Status.Wrap( -1 )
-
-		self.lbl_Status.Hide()
-
-		bSizer1.Add( self.lbl_Status, 0, wx.ALL, 5 )
-
 
 		self.SetSizer( bSizer1 )
 		self.Layout()
+		self.status_bar = self.CreateStatusBar( 2, wx.STB_SIZEGRIP, wx.ID_ANY )
 
 		self.Centre( wx.BOTH )
 

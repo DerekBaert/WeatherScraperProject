@@ -1,52 +1,89 @@
-"""Module level docstring"""
-
+"""UI for the weather processor project"""
 from datetime import datetime
+import time
 import logging
 import urllib.request
 import db_operations
 import scrape_weather
 import plot_operations
+from frmMain import fraMain
 
-class WeatherProcessor():
-    """Class level docstring."""
+class UI(fraMain):
+    """Class level docstring"""
     plot = plot_operations.PlotOperations()
     db = db_operations.DBOperations()
 
-    def user_choice(self):
+    def __init__(self):
         """
-        Prompt user for selection.
+        Initializes variables based on if database is populated or not.
         """
-        print("Welcome to the Weather Processor.")
-        print("""Please make a selection:
-        1: Update Weather Set
-        2: Download Full Data Set
-        3. Generate Box Plot from Range
-        4: Generate Line Plot from Date
-        5: Exit""")
         try:
-            option = input("Selection: ")
+            super().__init__(None)
+            self.db.initialize_db()
+            if self.db.count() == 0:
+                self.disable_controls()
+            else:
+                self.set_dropdowns()
+                self.enable_controls()
         except Exception as error:
-            logging.warning("Error: user_choice: Error with input: %s", error)
-        try:
-            match option:
-                case "1":
-                    self.update_weather()
-                case "2":
-                    self.download_weather()
-                case "3":
-                    self.generate_box_plot()
-                case "4":
-                    self.generate_line_plot()
-                case "5":
-                    quit()
-                case _:
-                    print("Error: Invalid entry, please enter a valid selection.")
-                    logging.warning("Error: user_choice: Incorrect user input: %s", option)
-                    self.user_choice()
-        except Exception as error:
-            logging.warning("Error: user_choice: Processing user selection: %s", error)
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
+            logging.warning("__init__: Initiliazing variables: %s", error)
 
-    def update_weather(self):
+    def disable_controls(self):
+        """
+        Disables all dropdowns and buttons other than the download button.
+        """
+        try:
+            self.drp_StartYear.Disable()
+            self.drp_EndYear.Disable()
+            self.drp_Year.Disable()
+            self.drp_Month.Disable()
+            self.btnBox.Disable()
+            self.btnUpdate.Disable()
+            self.btnLine.Disable()
+        except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
+            logging.warning("disable_controls: Error disabling controls %s", error)
+
+    def enable_controls(self):
+        """
+        Enables all dropdowns and buttons other than the download button.
+        """
+        try:
+            self.drp_StartYear.Enable()
+            self.drp_EndYear.Enable()
+            self.drp_Year.Enable()
+            self.drp_Month.Enable()
+            self.btnBox.Enable()
+            self.btnUpdate.Enable()
+            self.btnLine.Enable()
+        except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
+            logging.warning("enable_controls: Error enabling controls %s", error)
+
+    def set_dropdowns(self):
+        """
+        Sets years in the drop down fields.
+        """
+        try:
+            self.first = self.db.first_day()
+            self.first_year = int(self.first.year)
+            self.last = self.db.last_day()
+            self.last_year = int(self.last.year)
+            years = []
+            for year in range(self.first_year, self.last_year+1):
+                years.append(str(year))
+            self.drp_StartYear.SetItems(years)
+            self.drp_StartYear.SetSelection(0)
+            self.drp_EndYear.SetItems(years)
+            self.drp_EndYear.SetSelection(0)
+            self.drp_Year.SetItems(years)
+            self.drp_Year.SetSelection(0)
+        except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
+            logging.warning("set_dropdowns: Error populating dropdowns %s", error)
+
+    def btnUpdate_Click( self, event ):
         """
         Updates the database with any missing dates from the website.
         """
@@ -58,17 +95,20 @@ class WeatherProcessor():
             end_check = True
             weather = {}
         except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
             logging.warning("Error: update_weather: Initiliazing variables: %s", error)
         try:
             while end_check:
-                print(f"Year: {year} Month: {month}")
+                self.status_bar.SetStatusText(f"Year: {year} Month: {month}")
                 try:
+                    self.status_bar.SetStatusText("Scraping Weather...")
                     scraper = scrape_weather.WeatherScraper()
                     with urllib.request.urlopen(f'https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear=2022&Day=1&Year={year}&Month={month}') as response:
                         html = str(response.read())
                     scraper.feed(html)
                     weather = weather | scraper.weather
                 except Exception as error:
+                    self.status_bar.SetStatusText("Error, see log for details.", 1)
                     logging.warning("update_weather: Adding data to weather dictionary: %s", error)
                 if month == 1:
                     year = year - 1
@@ -78,18 +118,23 @@ class WeatherProcessor():
                 if scraper.compare_url(last_day.month, last_day.year):
                     end_check = False
         except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
             logging.warning("Error: update_weather: Looping through scraper: %s", error)
-        print("Scrape complete, saving to database.")
+        self.status_bar.SetStatusText("Scrape complete, saving to database...")
         try:
-            self.db.initialize_db()
             self.db.save_data(weather)
-            print("Up to date.")
+            self.status_bar.SetStatusText("Up to date.")
         except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
             logging.warning("Error: update_weather: Saving weather to database: %s", error)
-        print("Saved to database.")
-        self.user_choice()
+        self.status_bar.SetStatusText("Saved to database.")
+        time.sleep(1)
+        self.status_bar.SetStatusText("")
+        self.set_dropdowns()
+        self.enable_controls()
+        self.Update()
 
-    def download_weather(self):
+    def btnDownload_Click( self, event ):
         """
         Purges database and repopulates with data from site.
         """
@@ -101,10 +146,11 @@ class WeatherProcessor():
             end_check = True
             weather = {}
         except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
             logging.warning("Error: download_weather: Initializing variables: %s", error)
         try:
             while end_check:
-                print(f"Year: {year} Month: {month}")
+                self.status_bar.SetStatusText(f"Year: {year} Month: {month}")
                 try:
                     scraper = scrape_weather.WeatherScraper()
                     with urllib.request.urlopen(f'https://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear=2022&Day=1&Year={year}&Month={month}') as response:
@@ -112,6 +158,7 @@ class WeatherProcessor():
                     scraper.feed(html)
                     weather = weather | scraper.weather
                 except Exception as error:
+                    self.status_bar.SetStatusText("Error, see log for details.", 1)
                     message = "download_weather: Adding data to weather dictionary: %s", error
                     logging.warning(message)
                 if scraper.weather:
@@ -122,110 +169,56 @@ class WeatherProcessor():
                 else:
                     month = month - 1
         except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
             logging.warning("Error: download_weather: Looping through scraper: %s", error)
-        print("Scrape complete, saving to database.")
+        self.status_bar.SetStatusText("Scrape complete, saving to database...")
         try:
-            self.db.initialize_db()
             self.db.save_data(weather)
         except Exception as error:
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
             logging.warning("Error: download_weather: Saving weather to database: %s", error)
-        print("Saved to database.")
-        self.user_choice()
+        self.status_bar.SetStatusText("Saved to database.")
+        time.sleep(1)
+        self.status_bar.SetStatusText("")
+        self.set_dropdowns()
+        self.enable_controls()
+        self.Update()
 
-    def generate_box_plot(self):
+    def btnBox_Click( self, event ):
         """
-        Generates a Box Plot from the given range.
+        Handles the click event of the "Generate Box Plot" button.
         """
-        earliest_date = self.db.first_day()
-        latest_date = self.db.last_day()
         try:
-            print("Box Plot Generator.")
-            year_range = []
-            input_check = True
-            try:
-                while True:
-                    start_year = input("Enter the starting year: ")
-                    try:
-                        start_in_range = int(start_year) in range(int(earliest_date.year), int(latest_date.year) + 1)
-                        if len(start_year) == 4 and start_year.isdigit() and start_in_range:
-                            end_year = input("Enter the ending year: ")
-                            try:
-                                end_in_range = int(end_year) in range(int(earliest_date.year), int(latest_date.year) + 1)
-                                after_start = int(end_year) > int(start_year)
-                                length = len(end_year) == 4
-                                if length and end_year.isdigit() and end_in_range and after_start:
-                                    input_check = True
-                                else:
-                                    input_check = False
-                            except Exception:
-                                input_check = False
-                        else:
-                            input_check = False
-                    except Exception:
-                        input_check = False
-                    if not input_check:
-                        print(f"Please enter a 4 digit year between {earliest_date.year} and {latest_date.year}.")
-                        logging.warning("generate_box_plot: Incorrect user input")
-                    else:
-                        break
-            except Exception as error:
-                logging.warning("Error: generate_box_plot: Collecting input: %s", error)
-            year_range.append(start_year)
-            year_range.append(end_year)
+            self.status_bar.SetStatusText("")
+            self.status_bar.SetStatusText("",1)
+            start_index = self.drp_StartYear.GetCurrentSelection()
+            end_index = self.drp_EndYear.GetCurrentSelection()
+            start = int(self.drp_StartYear.GetString(start_index))
+            end = int(self.drp_EndYear.GetString(end_index))
+            if start < end:
+                year_range = []
+                year_range.append(start)
+                year_range.append(end)
+                data = self.db.fetch_box_data(year_range)
+                self.plot.box_plot(data)
+            else:
+                self.status_bar.SetStatusText("Starting Year must be before Ending Year",1)
         except Exception as error:
-            logging.warning("Error: generate_box_plot: Building variables: %s", error)
-        try:
-            weather = self.db.fetch_box_data(year_range)
-        except Exception as error:
-            logging.warning("Error: generate_box_plot: Fetching data from database: %s", error)
-        try:
-            self.plot.box_plot(weather)
-        except Exception as error:
-            logging.warning("Error: generate_box_plot: Creating box plot: %s", error)
-        self.user_choice()
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
+            logging.warning("Error generating box plot: %s", error)
 
-    def generate_line_plot(self):
+    def btnLine_Click( self, event ):
         """
-        Generates a Line Plot from the given range.
+        Handles the click event of the "Generate Line Plot" button.
         """
-        earliest_date = self.db.first_day()
-        latest_date = self.db.last_day()
         try:
-            print("Line Plot Generator.")
-            try:
-                while True:
-                    month = input("Enter a month between 1-12: ")
-                    try:
-                        if int(month) in range(1, 13):
-                            year = input("Enter a year: ")
-                            year_out_of_range = int(year) not in range(int(earliest_date.year), int(latest_date.year) + 1)
-                            if len(year) != 4 or not year.isdigit() or year_out_of_range:
-                                message = f"Please enter a 4 digit year between {earliest_date.year} and {latest_date.year}."
-                                print(message)
-                            else:
-                                break
-                        else:
-                            print("Please enter a month between 1-12.")
-                            logging.warning("generate_line_plot: Incorrect user input")
-                    except ValueError:
-                        print("Please enter a month between 1-12.")
-                        logging.warning("generate_line_plot: Incorrect user input")
-            except Exception as error:
-                logging.warning("Error: generate_line_plot: Collecting input: %s", error)
-            date = datetime(int(year), int(month), 1)
+            year_index = self.drp_Year.GetCurrentSelection()
+            year = int(self.drp_Year.GetString(year_index))
+            month_index = self.drp_Month.CurrentSelection
+            month = datetime.strptime(self.drp_Month.GetString(month_index), "%B").month
+            date = datetime(year, month, 1)
+            data = self.db.fetch_line_data(date)
+            self.plot.line_plot(data)
         except Exception as error:
-            logging.warning("Error: generate_line_plot: Building variables: %s", error)
-        try:
-            weather = self.db.fetch_line_data(date)
-        except Exception as error:
-            logging.warning("Error: generate_line_plot: Fetching data from database: %s", error)
-        try:
-            self.plot.line_plot(weather)
-        except Exception as error:
-            logging.warning("Error: generate_line_plot: Creating box plot: %s", error)
-        self.user_choice()
-
-if __name__ == "__main__":
-    logging.basicConfig(filename="weatherlogfile.log", level=logging.WARNING, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    weather = WeatherProcessor()
-    weather.user_choice()
+            self.status_bar.SetStatusText("Error, see log for details.", 1)
+            logging.warning("Error generating line plot: %s", error)

@@ -1,7 +1,8 @@
 import wx
-from ui import UI
+from weather_processor import UI
 
-app = wx.App()
-frm = UI()
-frm.Show()
-app.MainLoop()
+if __name__ == "__main__":
+    app = wx.App()
+    frm = UI()
+    frm.Show()
+    app.MainLoop()
