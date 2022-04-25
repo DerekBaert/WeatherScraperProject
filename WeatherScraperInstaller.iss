@@ -35,9 +35,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
+[Dirs]
+Name: "{app}"; Permissions: users-full
+
 [Files]
-Source: "C:\Users\derek\Documents\School\BIT\Semester 5\Python\Final Project\WeatherScraperProject\mymodules\dist\main_ui\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\derek\Documents\School\BIT\Semester 5\Python\Final Project\WeatherScraperProject\mymodules\dist\main_ui\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\derek\Documents\School\BIT\Semester 5\Python\Final Project\WeatherScraperProject\mymodules\dist\main_ui\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; 
+Source: "C:\Users\derek\Documents\School\BIT\Semester 5\Python\Final Project\WeatherScraperProject\mymodules\dist\main_ui\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs;
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
